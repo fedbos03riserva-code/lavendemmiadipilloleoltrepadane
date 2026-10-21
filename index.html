@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La Vendemmia – Pillole Oltrepadane</title>
+<style>
+:root{--bg:#f6efe0;--card:#fffaf0;--ink:#2b2118;--mute:#6b5a48;--wine:#6d1f3a;--leaf:#4f7a3a;--bad:#b3362f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1713;--card:#2a221b;--ink:#f3e9d8;--mute:#bfae98;--wine:#d6708f;--leaf:#6f9d55;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1c1713;--card:#2a221b;--ink:#f3e9d8;--mute:#bfae98;--wine:#d6708f;--leaf:#6f9d55;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;min-height:100vh}
+main{max-width:480px;margin:0 auto;padding:18px}
+h1{font-size:2rem;margin:8px 0 2px;color:var(--wine);text-align:center}
+.sub{text-align:center;color:var(--mute);margin:0 0 16px}
+.card{background:var(--card);border-radius:16px;padding:18px;margin-bottom:14px}
+.btn,.opt{display:block;width:100%;padding:13px;margin:8px 0;border-radius:12px;border:2px solid var(--wine);background:transparent;color:var(--ink);font:1rem system-ui,sans-serif;cursor:pointer;text-align:center;text-decoration:none}
+.btn{background:var(--wine);color:#fff}
+.btn.alt{background:transparent;color:var(--ink)}
+.opt{text-align:left}
+.opt.ok{background:var(--leaf);border-color:var(--leaf);color:#fff}
+.opt.ko{background:var(--bad);border-color:var(--bad);color:#fff}
+input{width:100%;padding:12px;border-radius:12px;border:2px solid var(--mute);background:var(--bg);color:var(--ink);font:1rem system-ui,sans-serif}
+.tag{font:600 .75rem system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--wine)}
+.top{display:flex;justify-content:space-between;font:.9rem system-ui,sans-serif;color:var(--mute)}
+.tbar{height:8px;background:var(--card);border-radius:6px;overflow:hidden;margin:8px 0 14px}
+.tbar i{display:block;height:100%;background:var(--wine);width:100%}
+.q{font-size:1.25rem;line-height:1.4;margin:6px 0 12px}
+.big{font-size:3rem;text-align:center;margin:4px 0;color:var(--wine)}
+.c{text-align:center}
+.row{display:flex;gap:10px;font:.95rem system-ui,sans-serif;padding:8px 0;border-bottom:1px solid var(--bg)}
+.row b{width:28px}.row span{flex:1;overflow:hidden;text-overflow:ellipsis}
+.note{color:var(--mute);font:.85rem system-ui,sans-serif;text-align:center}
+.expl{margin:12px 0 4px;padding:12px 14px;border-left:4px solid var(--leaf);background:var(--bg);border-radius:8px;font:.95rem/1.45 system-ui,sans-serif}
+.pic{width:100%;border-radius:12px;display:block;margin-top:8px}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script>
+// ✏️ Per cambiare le domande modifica solo la lista QUESTIONS.
+// c = categoria · q = domanda · o = risposte (LA PRIMA È QUELLA GIUSTA, vengono mescolate in gioco) · e = pillola di spiegazione
+const IG="https://www.instagram.com/pilloleoltrepadane/";
+const SITE=""; // quando il dominio è attivo scrivi qui "pilloleoltrepadane.it": comparirà nell’immagine per le storie
+const QUESTIONS=[
+// ——— VINI ———
+{c:"Vini",q:"Come si chiama lo spumante rosé 100% Pinot Nero dell’Oltrepò?",o:["Cruasé","Rosatello","Pinot Rosa"],e:"È il Metodo Classico rosé dell’Oltrepò Pavese, fatto solo con uve Pinot Nero."},
+{c:"Vini",q:"Per fare spumante dal Pinot Nero (uva rossa), come si vinifica?",o:["In bianco, senza bucce","Con lunga macerazione","Con uve appassite"],e:"Il mosto viene separato subito dalle bucce: così lo spumante resta chiaro."},
+{c:"Vini",q:"Con quale uva si fa la Bonarda dell’Oltrepò?",o:["Croatina","Barbera","Uva Rara"],e:"In Oltrepò «Bonarda» è il vino da Croatina: DOC dal 1970, con almeno l’85% di questa uva."},
+{c:"Vini",q:"Come si chiama l’Ughetta di Canneto in Piemonte?",o:["Vespolina","Freisa","Grignolino"],e:"Ughetta in Oltrepò, Vespolina in Piemonte: il DNA conferma che è la stessa uva."},
+{c:"Vini",q:"Con quale celebre vitigno piemontese l’Ughetta è imparentata?",o:["Nebbiolo","Barbera","Moscato"],e:"Gli studi sul DNA mostrano un legame diretto con il Nebbiolo, l’uva del Barolo."},
+{c:"Vini",q:"Quante uve compongono il Buttafuoco Storico?",o:["Quattro","Due","Sei"],e:"Croatina, Barbera, Uva Rara e Ughetta, da vigne storiche tra le valli Scuropasso e Versa."},
+{c:"Vini",q:"Quale uva completa Croatina e Barbera nel Buttafuoco?",o:["Uva Rara","Nebbiolo","Lambrusco"],e:"L’Uva Rara (con l’Ughetta) porta spezie e note aromatiche al blend."},
+{c:"Vini",q:"Il “Sangue di Giuda” nasce soprattutto da uve…",o:["Croatina e Barbera","Pinot Nero e Riesling","Moscato e Cortese"],e:"Croatina e Barbera, spesso con un tocco di Uva Rara e Ughetta."},
+{c:"Vini",q:"La Bonarda argentina è la stessa uva della Croatina?",o:["No, sono varietà diverse","Sì, è identica","Sì, ma con un altro nome"],e:"Anche in Argentina «Bonarda» è un’altra varietà: non è imparentata con la nostra Croatina."},
+{c:"Vini",q:"Chi piantò i primi vigneti di Pinot Nero in Oltrepò, intorno al 1865?",o:["Conte Carlo Giorgi di Vistarino","Marchese Malaspina","Duca Visconti"],e:"Fu il conte Giorgi di Vistarino: da allora il Pinot Nero è il simbolo dell’Oltrepò spumantistico."},
+{c:"Vini",q:"Quanto Pinot Nero richiede almeno l’Oltrepò Pavese Metodo Classico DOCG?",o:["70%","40%","100%"],e:"Almeno il 70% di Pinot Nero; il Cruasé, invece, è 100% Pinot Nero."},
+// ——— SAPORI ———
+{c:"Sapori",q:"Da che anno il Salame di Varzi è DOP?",o:["1996","1966","2006"],e:"È DOP dal 1996, ma già nel XII secolo se ne trovano le prime tracce."},
+{c:"Sapori",q:"In quale budello viene insaccato il Salame di Varzi DOP?",o:["Budello gentile","Budello cieco","Budello gigante"],e:"Nel budello gentile, un involucro naturale."},
+{c:"Sapori",q:"Con cosa viene profumato il Salame di Varzi?",o:["Aglio e vino rosso","Miele e pepe","Cannella e vino bianco"],e:"Con un infuso di aglio e vino rosso."},
+{c:"Sapori",q:"Quali tagli del maiale usa il Salame di Varzi?",o:["Anche i tagli nobili","Solo il lardo","Solo gli scarti"],e:"Anche quelli che altrove diventano coppe e prosciutti."},
+{c:"Sapori",q:"Quali due prodotti sono famosi a Voghera?",o:["Coppa e peperoni","Cotechino e radicchio","Culatello e asparagi"],e:"La coppa e i peperoni di Voghera sono prodotti tipici della città."},
+{c:"Sapori",q:"Come si presenta spesso la Bonarda dell’Oltrepò?",o:["Vivace, leggermente frizzante","Ferma e invecchiata in legno","Dolce da dessert"],e:"La versione vivace, appena frizzante, è un tratto distintivo del territorio."},
+// ——— BORGHI ———
+{c:"Borghi",q:"Su quanti livelli sovrapposti è costruito il borgo di Varzi?",o:["Cinque","Tre","Sette"],e:"La strada di un livello poggia su portici e cantine di quello sotto, per cinque piani."},
+{c:"Borghi",q:"Chi assegnò nel 1164 il feudo di Varzi ai Malaspina?",o:["Federico Barbarossa","Carlo Magno","Napoleone"],e:"Dal feudo nacque il Marchesato di Varzi."},
+{c:"Borghi",q:"In quale valle si trova Varzi?",o:["Val Staffora","Val Versa","Val Coppa"],e:"Varzi è il cuore della Val Staffora, lungo l’antica Via del Sale."},
+{c:"Borghi",q:"Cosa trasportavano soprattutto le carovane lungo la Via del Sale?",o:["Sale","Seta","Armi"],e:"Sale (e spezie) dal Mar Ligure verso la Pianura Padana."},
+{c:"Borghi",q:"Nel 1460 a Varzi, chi fu rinchiuso nella torre del castello Malaspina?",o:["Donne accusate di stregoneria","Soldati nemici","Mercanti di sale"],e:"Da allora è chiamata «Torre delle Streghe»."},
+{c:"Borghi",q:"Quanto sono spesse al massimo le mura del Castello di Zavattarello?",o:["4 metri","1 metro","10 metri"],e:"Fino a 4 metri di pietra: per questo il castello resisteva agli assedi."},
+{c:"Borghi",q:"Quale famiglia possedette il castello di Zavattarello per quasi sei secoli?",o:["I Dal Verme","I Sforza","I Visconti"],e:"Dal 1390, fino al passaggio al Comune di Zavattarello."},
+{c:"Borghi",q:"Come si chiamava Casteggio in epoca romana?",o:["Clastidium","Ticinum","Placentia"],e:"Qui, nel 222 a.C., il console Marcello sconfisse i Celti."},
+{c:"Borghi",q:"Quante province si incontrano a Brallo di Pregola?",o:["Quattro","Due","Tre"],e:"Pavia, Piacenza, Genova e Alessandria."},
+{c:"Borghi",q:"Cosa significa «Brallo», di origine celtica?",o:["Pascolo, alpeggio","Fiume","Ponte"],e:"È una parola celtica legata ai pascoli di montagna."},
+{c:"Borghi",q:"Qual è l’unico borgo fantasma della provincia di Pavia?",o:["Rovaiolo Vecchio","Zavattarello","Fortunago"],e:"Rovaiolo Vecchio, nel territorio di Brallo di Pregola."},
+{c:"Borghi",q:"Quale cittadina dell’Oltrepò è famosa per la tradizione delle fisarmoniche?",o:["Stradella","Broni","Casteggio"],e:"Stradella, la città della fisarmonica."},
+{c:"Borghi",q:"Quale museo insolito ha Montecalvo Versiggia?",o:["Quello del cavatappi","Quello della fisarmonica","Quello del sale"],e:"Il paese si definisce anche capitale internazionale del Pinot Nero."},
+{c:"Borghi",q:"Cosa nacque a Montù Beccaria nel 1902?",o:["Quella ritenuta la prima cantina sociale d’Italia","Il primo spumante italiano","La prima DOC del Paese"],e:"È considerata la prima cantina sociale d’Italia, nel cuore della Valle Versa."},
+{c:"Borghi",q:"Quale di questi borghi dell’Oltrepò è tra i Borghi più Belli d’Italia?",o:["Fortunago","Voghera","Stradella"],e:"Fortunago, tra le colline della Val Coppa."},
+// ——— MONTAGNA E STORIA ———
+{c:"Montagna",q:"Quanto è alto il Monte Lesima, la cima più alta dell’Oltrepò?",o:["1.724 metri","1.124 metri","2.124 metri"],e:"Sulla vetta c’è un radar militare, visibile da chilometri."},
+{c:"Montagna",q:"Quali due valli separa il Monte Penice?",o:["Staffora e Trebbia","Versa e Tidone","Coppa e Scuropasso"],e:"La Val Staffora (Pavia) e la Val Trebbia (Piacenza)."},
+{c:"Storia",q:"Con quali fondi furono costruite le prime antenne RAI del Penice?",o:["Piano Marshall","PNRR","Fondi dei Savoia"],e:"Con il Piano Marshall, per la ricostruzione dopo la guerra: la tv partì il 3 gennaio 1954."},
+{c:"Montagna",q:"Quanto è alta la torre principale RAI del Penice?",o:["150 metri","50 metri","300 metri"],e:"Il ripetitore copre il bacino d’utenza più numeroso d’Italia."},
+{c:"Storia",q:"Secondo la tradizione, chi scoprì il Monte Penice nel 614?",o:["San Colombano","San Francesco","Sant’Ambrogio"],e:"Così racconta la tradizione sul santuario in vetta, documentato dal VII secolo."},
+{c:"Territorio",q:"Cosa significa «Oltrepò»?",o:["Al di là del Po","Sopra il Po","Foce del Po"],e:"Indica la zona a sud del Po, vista da Pavia."},
+{c:"Territorio",q:"L’Oltrepò è la più estesa zona vitivinicola di quale regione?",o:["Lombardia","Piemonte","Emilia-Romagna"],e:"Con circa 12.000 ettari (le stime variano tra 11.000 e 13.500) è la prima della Lombardia."},
+// ——— ATTUALITÀ E CLIMA ———
+{c:"Attualità",q:"Dove è partita la vendemmia 2026 in Oltrepò?",o:["Oliva Gessi","Stradella","Varzi"],e:"Il 28 luglio 2026, con circa una settimana di anticipo sul 2025."},
+{c:"Clima",q:"Di quanto giugno 2026 ha superato la norma 1991-2020 nell’Europa occidentale?",o:["Di 3,06 °C","Di 0,5 °C","Di 1 °C"],e:"Secondo Copernicus: 20,74 °C di media, il giugno più caldo mai registrato nella regione."},
+{c:"Clima",q:"Qual è la temperatura più bassa documentata a Pavia?",o:["−16,2 °C","−8 °C","−25 °C"],e:"−16,2 °C, il 10 gennaio 1871."},
+{c:"Attualità",q:"Quale misura per le crisi prevede il Pacchetto vino UE?",o:["Estirpazione volontaria dei vigneti","Divieto di vendemmia","Dazi sul vino italiano"],e:"Insieme a distillazione di crisi e vendemmia verde, con pagamenti nazionali."},
+{c:"Attualità",q:"Nel 2025 i prezzi delle uve Moscato dell’Oltrepò, rispetto al 2023, sono…",o:["Quasi dimezzati","Raddoppiati","Rimasti uguali"],e:"Circa −47%, secondo i dati Unioncamere-BMTI sulla vendemmia 2025."},
+{c:"Territorio",q:"Circa quanti ettari di vigneto conta l’Oltrepò Pavese?",o:["Circa 12.000","Circa 2.000","Circa 40.000"],e:"Circa 12.000 ettari: quasi 3.000 sono Pinot Nero."}
+];
+const N=10, SECS=15;
+const $=s=>document.querySelector(s), app=$("#app");
+let db=null,uid=null,nick="",localBest=0,st={};
+try{nick=localStorage.getItem("v_nick")||"";localBest=+localStorage.getItem("v_best")||0}catch(e){}
+(async()=>{try{
+ if(!window.claude)return;
+ const d=await claude.use("db"),u=await claude.use("user");
+ if(d&&u){const can=await u.can("data.write");uid=await u.id();if(uid&&can!==false)db=d}
+}catch(e){}
+ if(st.home)home();
+})();
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=t=>String(t).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+
+function home(){
+ st={home:true};
+ app.innerHTML=`<h1>🍇 La Vendemmia</h1><p class="sub">il quiz di Pillole Oltrepadane</p>
+ <div class="card"><div class="tag">Come si gioca</div><p>${N} domande su vini, borghi, sapori e curiosità dell’Oltrepò Pavese, ${SECS} secondi ciascuna. Più sei veloce, più acini guadagni. Massimo ${N*(10+SECS)}!</p>
+ <input id="nick" maxlength="20" placeholder="Il tuo nome da vignaiolo" value="${esc(nick)}">
+ <button class="btn" id="go">Inizia la vendemmia</button>
+ ${db?'<button class="btn alt" id="lb">🏆 Classifica</button>':''}
+ <p class="note">Il tuo record: <b>${localBest}</b> acini${db?'':''}</p></div>
+ <a class="btn alt" href="${IG}" target="_blank" rel="noopener">Segui @pilloleoltrepadane</a>`;
+ $("#go").onclick=()=>{nick=($("#nick").value.trim()||"Vignaiolo anonimo").slice(0,20);try{localStorage.setItem("v_nick",nick)}catch(e){};play()};
+ if(db)$("#lb").onclick=()=>board();
+}
+
+function play(){
+ const qs=shuffle(QUESTIONS).slice(0,N).map(x=>({c:x.c,q:x.q,e:x.e,o:shuffle(x.o.map((t,i)=>({t,c:i===0})))}));
+ st={qs,i:0,score:0,right:0};ask();
+}
+let timer;
+function ask(){
+ const q=st.qs[st.i];let left=SECS*10,locked=false;
+ app.innerHTML=`<div class="top"><span>Domanda ${st.i+1}/${st.qs.length}</span><span>🍇 ${st.score}</span></div>
+ <div class="tbar"><i id="tb"></i></div><div class="card"><div class="tag">${esc(q.c)}</div><p class="q">${esc(q.q)}</p><div id="opts"></div><div id="ex"></div></div>`;
+ const box=$("#opts");
+ const end=(pick)=>{
+  if(locked)return;locked=true;clearInterval(timer);
+  [...box.children].forEach((b,k)=>{b.disabled=true;if(q.o[k].c)b.classList.add("ok")});
+  if(pick!=null){if(q.o[pick].c){st.score+=10+Math.ceil(left/10);st.right++}else box.children[pick].classList.add("ko")}
+  const last=st.i+1>=st.qs.length;
+  $("#ex").innerHTML=`<div class="expl">${pick==null?"⏱️ Tempo scaduto. ":pick!=null&&q.o[pick].c?"✅ Giusto! ":"❌ Non proprio. "}${esc(q.e)}</div><button class="btn" id="nx">${last?"Vedi il risultato":"Avanti"}</button>`;
+  $("#nx").onclick=()=>{st.i++;st.i<st.qs.length?ask():finish()};
+  try{$("#nx").focus({preventScroll:true})}catch(e){}
+ };
+ q.o.forEach((o,k)=>{const b=document.createElement("button");b.className="opt";b.textContent=o.t;b.onclick=()=>end(k);box.appendChild(b)});
+ clearInterval(timer);
+ timer=setInterval(()=>{left--;$("#tb").style.width=(left/(SECS*10)*100)+"%";if(left<=0)end(null)},100);
+}
+
+async function finish(){
+ const s=st.score,isLocal=s>localBest;
+ if(isLocal){localBest=s;try{localStorage.setItem("v_best",s)}catch(e){}}
+ let saved="";
+ if(db){try{
+  const ref=db.doc("scores/"+uid),snap=await ref.get(),old=snap.exists?snap.data():{};
+  const best=Math.max(old.best||0,s);
+  await ref.set({nick,best});
+  saved="Punteggio salvato in classifica ✅";
+ }catch(e){saved="Classifica non raggiungibile ora"}}
+ const rank=s>=200?"Maestro di cantina 🏆":s>=140?"Vignaiolo esperto 🍷":s>=70?"Vendemmiatore 🍇":"Apprendista 🌱";
+ app.innerHTML=`<h1>Vendemmia finita!</h1><div class="card c"><div class="tag">${esc(nick)}</div>
+ <div class="big">${s}</div><p>acini · ${st.right}/${st.qs.length} giuste</p><p><b>${rank}</b></p>${isLocal?'<p>🎉 Nuovo record personale!</p>':''}<p class="note">${saved}</p></div>
+ <button class="btn" id="img">📸 Salva immagine per le storie</button>
+ <div id="pic"></div>
+ <button class="btn alt" id="sh">📲 Sfida un amico</button>
+ ${db?'<button class="btn alt" id="lb">🏆 Classifica</button>':''}
+ <button class="btn alt" id="again">Rigioca</button>
+ <a class="btn alt" href="${IG}" target="_blank" rel="noopener">Segui @pilloleoltrepadane per le prossime pillole</a>`;
+ $("#again").onclick=play;
+ if(db)$("#lb").onclick=()=>board();
+ $("#sh").onclick=async()=>{
+  const t="Ho fatto "+s+" acini alla Vendemmia dell’Oltrepò 🍇 Riesci a battermi?";
+  try{if(navigator.share){await navigator.share({title:"La Vendemmia",text:t,url:location.href});return}}catch(e){return}
+  try{await navigator.clipboard.writeText(t+" "+location.href);$("#sh").textContent="Copiato! ✅"}catch(e){}
+ };
+ $("#img").onclick=()=>story(s,rank);
+}
+
+function story(s,rank){
+ const c=document.createElement("canvas");c.width=1080;c.height=1920;const x=c.getContext("2d");
+ const g=x.createLinearGradient(0,0,0,1920);g.addColorStop(0,"#5a1230");g.addColorStop(1,"#2a0a18");x.fillStyle=g;x.fillRect(0,0,1080,1920);
+ x.textAlign="center";x.fillStyle="#f6efe0";
+ x.font="200px serif";x.fillText("🍇",540,520);
+ x.font="bold 110px Georgia,serif";x.fillText("La Vendemmia",540,700);
+ x.font="48px Georgia,serif";x.fillStyle="#e3b258";x.fillText("Il quiz sull’Oltrepò Pavese",540,775);
+ x.fillStyle="#f6efe0";x.font="bold 360px Georgia,serif";x.fillText(String(s),540,1150);
+ x.font="60px Georgia,serif";x.fillText("acini",540,1230);
+ x.font="bold 64px Georgia,serif";x.fillText(nick,540,1380);
+ x.font="50px Georgia,serif";x.fillStyle="#e3b258";x.fillText(rank.replace(/[^\p{L}\s]/gu,"").trim(),540,1460);
+ x.fillStyle="#f6efe0";x.font="bold 64px Georgia,serif";x.fillText("Riesci a battermi?",540,1640);
+ x.font="48px system-ui,sans-serif";x.fillText("@pilloleoltrepadane",540,1730);
+ if(SITE){x.font="42px system-ui,sans-serif";x.fillStyle="#e3b258";x.fillText(SITE,540,1795)}
+ const show=()=>{const p=$("#pic");if(p){p.innerHTML='<img class="pic" alt="Il tuo punteggio" src="'+c.toDataURL("image/png")+'"><p class="note">Tieni premuto sull’immagine per salvarla e condividerla nelle storie.</p>'}};
+ c.toBlob(async b=>{
+  try{const d=await claude.use("downloads");if(d){await d.save({filename:"vendemmia-"+s+".png",data:b});return}}catch(e){}
+  try{const f=new File([b],"vendemmia.png",{type:"image/png"});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){}
+  show();
+ },"image/png");
+}
+
+async function board(){
+ app.innerHTML=`<h1>🏆 Record assoluto</h1><div class="card" id="rows">Caricamento…</div><button class="btn alt" id="bk">Indietro</button>`;
+ $("#bk").onclick=home;
+ try{
+  const f="best";
+  const snap=await db.collection("scores").orderBy(f,"desc").limit(20).get();
+  const r=snap.docs.map(d=>({id:d.id,...d.data()}));
+  $("#rows").innerHTML=r.length?r.map((x,i)=>`<div class="row"><b>${["🥇","🥈","🥉"][i]||i+1}</b><span>${esc(x.nick||"?")}${x.id===uid?" (tu)":""}</span><b style="width:auto">${esc(x[f]||0)}</b></div>`).join(""):"Ancora nessun punteggio: sii il primo!";
+ }catch(e){$("#rows").textContent="Classifica non raggiungibile ora."}
+}
+home();
+</script>
+</body>
+</html>
